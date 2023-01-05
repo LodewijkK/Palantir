@@ -19,6 +19,7 @@ module.exports = async interaction => {
         oldRole = serverData.redditRole;
         serverData.redditRole = role.id;
     }
+    await serverData.save();
 
     let server = interaction.guild;
     userSchema.find({}, (err, users) => {
