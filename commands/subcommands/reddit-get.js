@@ -57,9 +57,12 @@ module.exports = async interaction => {
                 })
                 .setTitle(redditData.subreddit.display_name_prefixed)
                 .setURL(`https://reddit.com${redditData.subreddit.url}`)
-                .addFields(
-                    { name: redditData.subreddit.title, value: `*"${redditData.subreddit.public_description}"*\n🌟 **${redditData.total_karma}** karma`, inline: true },
-                )
+                .addFields([
+                    {
+                        name: (redditData.subreddit.title.length) ? redditData.subreddit.title : redditData.name, 
+                        value: `${(redditData.subreddit.public_description.length) ? `*"${redditData.subreddit.public_description}"*\n` : ''}
+                            🌟 **${redditData.total_karma}** karma`, inline: true },
+                ])
                 .setThumbnail(redditData.subreddit.icon_img.split('?')[0])
                 .setColor('#ff5700')
                 .setFooter({text: `🍰 Account created ${formattedDate} \n${formatTimeDifference(dateCreated, new Date())} ago`})

@@ -6,7 +6,7 @@ module.exports = async interaction => {
     let userData = await userSchema.findOne({userId: interaction.user.id});
 
     if (userData?.redditUsername) {
-        return interaction.reply("You already have a Reddit username set!");
+        return interaction.reply({content: "You already have a Reddit username set!", ephemeral: true});
     }
     
     const options = {
