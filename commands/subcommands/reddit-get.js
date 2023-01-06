@@ -3,23 +3,28 @@ const request = require('request');
 const userSchema = require('../../models/userSchema.js');
   
 function formatTimeDifference(date1, date2) {
-    const years = date2.getFullYear() - date1.getFullYear();
-    const months = date2.getMonth() - date1.getMonth();
-    const days = date2.getDate() - date1.getDate();
-    let dateDifference = '';
+    let years = date2.getYear() - date1.getYear();
+    let months = date2.getMonth() - date1.getMonth();
+	let days = date2.getDate() - date1.getDate();
+  
+	if (days < 0) {
+        days += 31;
+  		months--;
+    }
 
-    if (years > 0) dateDifference += `${years} year${years > 1 ? 's' : ''}`;
-    
-    if (months > 0) {
-        if (dateDifference.length > 0) dateDifference += ', ';
-        dateDifference += `${months} month${months > 1 ? 's' : ''}`;
+    if (months < 0) {
+        months += 12;
+        years--;
     }
-    
-    if (days > 0) {
-        if (dateDifference.length > 0) dateDifference += ', and ';
-        dateDifference += `${days} day${days > 1 ? 's' : ''}`;
-    }
-    return dateDifference;
+
+    let result = [];
+    if (years) result.push(`${years} year${(years > 1) ? 's' : ''}`);
+    if (months) result.push(`${months} month${(months > 1) ? 's' : ''}`);
+    if (days) result.push(`${days} day${(days > 1) ? 's' : ''}`);
+
+    if (result.length == 3) return `${result[0]}, ${result[1]} and ${result[2]}`;
+    if (result.length == 2) return `${result[0]} and ${result[1]}`;
+    return result[0];
 }
 
 module.exports = async interaction => {
