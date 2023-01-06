@@ -16,19 +16,21 @@ module.exports = {
 
             const channel = await guild.channels.fetch(serverData.logChannelId);
 
-            channel.send({ 
-                embeds: [
-                    new EmbedBuilder()
-                        .setAuthor({
-                            name: `${oldUser.tag} changed their Discord ${
-                                (oldUser.username == newUser.username) ? "tag" : "username"
-                            }`, 
-                            iconURL: newUser.displayAvatarURL()
-                        })
-                        .setTitle(`\`${oldUser.tag}\` **→** \`${newUser.tag}\``)
-                        .setColor('#ffcd59')
-                ]
-            });
+            try {
+                channel.send({ 
+                    embeds: [
+                        new EmbedBuilder()
+                            .setAuthor({
+                                name: `${oldUser.tag} changed their Discord ${
+                                    (oldUser.username == newUser.username) ? "tag" : "username"
+                                }`, 
+                                iconURL: newUser.displayAvatarURL()
+                            })
+                            .setTitle(`\`${oldUser.tag}\` **→** \`${newUser.tag}\``)
+                            .setColor('#ffcd59')
+                    ]
+                });
+            } catch(e){}
         })
     }
 }
