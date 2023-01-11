@@ -12,7 +12,7 @@ module.exports = {
 
             // Fetch & check information about server from database
             const serverData = await serverSchema.findOne({guildId: guild.id});
-            if (!serverData.logChannelId) return;
+            if (!serverData?.logChannelId) return;
 
             const channel = await guild.channels.fetch(serverData.logChannelId);
 

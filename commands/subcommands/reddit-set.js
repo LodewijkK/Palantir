@@ -52,7 +52,7 @@ module.exports = async (interaction, client) => {
 
     userData.save();
 
-    if (!serverData.logChannelId) return;
+    if (!serverData?.logChannelId) return;
     const guild = await client.guilds.cache.get(interaction.guild.id);
     const channel = await guild.channels.fetch(serverData.logChannelId);
     
