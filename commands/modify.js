@@ -6,7 +6,7 @@ const userSchema = require('../models/userSchema.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('modify')
-		.setDescription("Change a user's Reddit username")
+		.setDescription("Change a user's Reddit username (admin only)")
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addUserOption(option => option
             .setName('user')
@@ -94,4 +94,3 @@ module.exports = {
         });
     }
 };
-
