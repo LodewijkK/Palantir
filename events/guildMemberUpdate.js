@@ -25,7 +25,7 @@ module.exports = {
                             iconURL: newMember.user.displayAvatarURL()
                         })
                         .setTitle(`\`${oldNickname}\` **→** \`${newNickname}\``)
-                        .setColor('#fa7725')
+                        .setColor('#fab725')
                 ]
             });
         } 

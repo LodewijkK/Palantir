@@ -1,52 +1,70 @@
-// TODO: 
-// Add role to user
-// Change username
-// Let admin change username
-
-const request = require('request');
+const { EmbedBuilder } = require('discord.js');
+const request = require('request-promise');
 const serverSchema = require('../../models/serverSchema.js');
 const userSchema = require('../../models/userSchema.js');
 
-module.exports = async interaction => {
+module.exports = async (interaction, client) => {
     let username = interaction.options.getString('username').toLowerCase().replace('u/','');
     let userData = await userSchema.findOne({userId: interaction.user.id});
+    let serverData = await serverSchema.findOne({guildId: interaction.guild.id});
 
     if (username == userData?.redditUsername) {
         return interaction.reply({content: "You've already set your Reddit username!", ephemeral: true});
     }
+
+    let existingUser = await userSchema.findOne({ redditUsername: username });
+    if (existingUser) {
+        return interaction.reply({content: "Someone already has this username! Contact a mod if this is an issue.", ephemeral: true});
+    }
     
-    const options = {
-        url: `https://www.reddit.com/user/${username}.json`,
-        headers: {
-            'User-Agent': 'PALANTIR-DISCORD-BOT'
-        }
-    };
-
-    request(options, async (error, response, body) => {
-        let info = JSON.parse(body);
-        if (info?.error == 404) {
-            return interaction.reply({content: "This Reddit profile doesn't exist!", ephemeral: true});
-        }
-
-        if (userData?.redditUsername) {
-            interaction.reply({content: `Changed your Reddit username from **u/${userData.redditUsername}** to **u/${username}**`, ephemeral: true});
-            userData.redditUsername = username;
-        }
-        else {
-            interaction.reply({content: `Got it! Your Reddit username is **u/${username}**`, ephemeral: true});
-            
-            userData = await userSchema.create({
-                userId: interaction.user.id,
-                redditUsername: username
-            });
-            console.log(`Created new user schema: ${interaction.user.tag}`);
-        
-            let serverData = await serverSchema.findOne({guildId: interaction.guild.id});
-            if (serverData?.redditRole) {
-                interaction.member.roles.add(serverData.redditRole);
+    try {
+        await request({
+            url: `https://www.reddit.com/user/${username}.json`,
+            headers: {
+                'User-Agent': 'PALANTIR-DISCORD-BOT'
             }
-        }
+        });
+    }
+    catch(err) {
+        return interaction.reply({content: "This Reddit profile doesn't exist!", ephemeral: true});
+    }
 
-        userData.save();
+    let logMessage;
+    if (userData?.redditUsername) {
+        interaction.reply({content: `Changed your Reddit username from **u/${userData.redditUsername}** to **u/${username}**`, ephemeral: true});
+        logMessage = `\`u/${userData.redditUsername}\` → \`u/${username}\``;
+        userData.redditUsername = username;
+    }
+    else {
+        interaction.reply({content: `Got it! Your Reddit username is **u/${username}**`, ephemeral: true});
+        logMessage = `\`u/${username}\``;
+        
+        userData = await userSchema.create({
+            userId: interaction.user.id,
+            redditUsername: username
+        });
+        console.log(`Created new user schema: ${interaction.user.tag}`);
+    
+        if (serverData?.redditRole) {
+            interaction.member.roles.add(serverData.redditRole);
+        }
+    }
+
+    userData.save();
+
+    if (!serverData.logChannelId) return;
+    const guild = await client.guilds.cache.get(interaction.guild.id);
+    const channel = await guild.channels.fetch(serverData.logChannelId);
+    
+    channel.send({
+        embeds: [
+            new EmbedBuilder()
+                .setAuthor({
+                    name: `${interaction.user.tag} set their Reddit username`, 
+                    iconURL: interaction.user.displayAvatarURL()
+                })
+                .setTitle(logMessage)
+                .setColor('#ff5700')
+        ]
     });
 }

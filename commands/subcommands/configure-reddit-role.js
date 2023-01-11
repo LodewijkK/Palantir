@@ -1,7 +1,7 @@
 const serverSchema = require('../../models/serverSchema.js');
 const userSchema = require('../../models/userSchema.js');
 
-module.exports = async interaction => {
+module.exports = async (interaction) => {
     await interaction.deferReply({ephemeral: true});
 
     let role = interaction.options.getRole('role');

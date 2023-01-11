@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -24,8 +24,8 @@ module.exports = {
                 .setRequired(true)
             )
         ),
-	async execute(interaction) {
+	async execute(interaction, client) {
         let subcommand = interaction.options.getSubcommand();
-        require(`./subcommands/reddit-${subcommand}.js`)(interaction);
+        require(`./subcommands/reddit-${subcommand}.js`)(interaction, client);
 	},
 };
