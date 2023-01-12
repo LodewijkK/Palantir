@@ -70,6 +70,8 @@ module.exports = async (interaction) => {
             .setThumbnail(redditData.subreddit.icon_img.split('?')[0])
             .setColor('#ff5700')
             .setFooter({text: `🍰 Account created ${formattedDate} \n${formatTimeDifference(dateCreated, new Date())} ago`})
-    ]});
+        ],
+        ephemeral: true
+    });
 
 }
