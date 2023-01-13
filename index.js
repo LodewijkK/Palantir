@@ -54,9 +54,12 @@ const rest = new REST({ version: '10' }).setToken(token);
 
 // Connect to MongoDB for server and user database
 mongoose.set('strictQuery', false);
-mongoose.connect(process.env['mongoURL'], {
+await mongoose.connect(process.env['mongoURL'], {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
+	socketTimeoutMS: 50000,
+    keepAlive: true,
+    reconnectTries: 50000
 })
 .then(() => console.log("Connected to database!"))
 .catch(err => console.error(err));
