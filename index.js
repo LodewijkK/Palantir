@@ -57,9 +57,9 @@ mongoose.set('strictQuery', false);
 await mongoose.connect(process.env['mongoURL'], {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
-	socketTimeoutMS: 50000,
+	socketTimeoutMS: 100000,
     keepAlive: true,
-    reconnectTries: 50000
+    reconnectTries: 3000
 })
 .then(() => console.log("Connected to database!"))
 .catch(err => console.error(err));
