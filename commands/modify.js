@@ -22,6 +22,8 @@ module.exports = {
         ),
 
 	async execute(interaction, client) {
+        if (!interaction.guild) return interaction.reply("Can only run this in a server!");
+
         const user = interaction.options.getUser('user');
         const username = interaction.options.getString('username').toLowerCase().replace('u/','');
         let userData = await userSchema.findOne({userId: user.id});

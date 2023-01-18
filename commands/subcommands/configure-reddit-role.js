@@ -3,7 +3,8 @@ const userSchema = require('../../models/userSchema.js');
 
 module.exports = async (interaction) => {
     await interaction.deferReply({ephemeral: true});
-
+    if (!interaction.guild) return interaction.editReply("Can only run this in a server!");
+    
     let role = interaction.options.getRole('role');
     let oldRole;
 

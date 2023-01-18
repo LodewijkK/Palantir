@@ -1,6 +1,8 @@
 const serverSchema = require('../../models/serverSchema.js');
 
 module.exports = async (interaction) => {
+    if (!interaction.guild) return interaction.editReply("Can only run this in a server!");
+    
     let channel = interaction.options.getChannel('channel');
     let enabled = interaction.options.getBoolean('enabled') ?? true;
 

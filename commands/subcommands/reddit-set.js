@@ -6,7 +6,7 @@ const userSchema = require('../../models/userSchema.js');
 module.exports = async (interaction, client) => {
     let username = interaction.options.getString('username').toLowerCase().replace('u/','');
     let userData = await userSchema.findOne({userId: interaction.user.id});
-    let serverData = await serverSchema.findOne({guildId: interaction.guild.id});
+    let serverData = await serverSchema.findOne({guildId: interaction.guild?.id});
 
     if (username == userData?.redditUsername) {
         return interaction.reply({content: "You've already set your Reddit username!", ephemeral: true});
@@ -46,7 +46,7 @@ module.exports = async (interaction, client) => {
         console.log(`Created new user schema: ${interaction.user.tag}`);
     
         if (serverData?.redditRole) {
-            interaction.member.roles.add(serverData.redditRole);
+            interaction.member?.roles.add(serverData.redditRole);
         }
     }
 

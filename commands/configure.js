@@ -30,6 +30,8 @@ module.exports = {
         ),
 
     async execute(interaction) {
+        if (!interaction.guild) return interaction.reply("Can only run this in a server!");
+        
         let subcommand = interaction.options.getSubcommand();
         require(`./subcommands/configure-${subcommand}.js`)(interaction);
     }
