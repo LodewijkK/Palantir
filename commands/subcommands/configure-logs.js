@@ -1,6 +1,7 @@
 const serverSchema = require('../../models/serverSchema.js');
 
 module.exports = async (interaction) => {
+    await interaction.deferReply();
     if (!interaction.guild) return interaction.editReply("Can only run this in a server!");
     
     let channel = interaction.options.getChannel('channel');
@@ -21,9 +22,9 @@ module.exports = async (interaction) => {
     await serverData.save();
     
     if (enabled) {
-        interaction.reply(`All set! ${channel} will now be the output channel for any nickname and username updates.`);
+        interaction.editReply(`All set! ${channel} will now be the output channel for any nickname and username updates.`);
     }
     else {
-        interaction.reply(`All set! User updates are now **disabled**.`);
+        interaction.editReply(`All set! User updates are now **disabled**.`);
     }
 }

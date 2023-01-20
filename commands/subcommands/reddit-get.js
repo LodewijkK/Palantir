@@ -28,11 +28,12 @@ function formatTimeDifference(date1, date2) {
 }
 
 module.exports = async (interaction) => {
+    await interaction.deferReply({ ephemeral: true });
     let user = interaction.options.getUser('user');
     let userData = await userSchema.findOne({userId: user.id});
     
     if (!userData?.redditUsername) {
-        return await interaction.reply({content: `${user} has not linked their Reddit username!`, ephemeral: true});
+        return await interaction.editReply({content: `${user} has not linked their Reddit username!`, ephemeral: true});
     }
 
     let redditData;
@@ -46,14 +47,14 @@ module.exports = async (interaction) => {
         redditData = JSON.parse(body).data;
     }
     catch (err) {
-        return interaction.reply({content: `*${user.tag}* has set their Reddit username as *${userData.redditUsername}*, but their Reddit profile could not be found.`, ephemeral: true});
+        return interaction.editReply({content: `*${user.tag}* has set their Reddit username as *${userData.redditUsername}*, but their Reddit profile could not be found.`, ephemeral: true});
     }
 
     let dateCreated = new Date(redditData.created_utc * 1000);
     const months = ['Jan.', 'Feb.', 'Mar.', 'Apr.', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.'];
     let formattedDate = `${months[dateCreated.getMonth()]} ${dateCreated.getDate()}, ${dateCreated.getFullYear()}`;
 
-    interaction.reply({embeds: [
+    interaction.editReply({embeds: [
         new EmbedBuilder()
             .setAuthor({
                 name: `${user.tag}'s Reddit profile`, 

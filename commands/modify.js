@@ -22,7 +22,8 @@ module.exports = {
         ),
 
 	async execute(interaction, client) {
-        if (!interaction.guild) return interaction.reply("Can only run this in a server!");
+        await interaction.deferReply();
+        if (!interaction.guild) return interaction.editReply("Can only run this in a server!");
 
         const user = interaction.options.getUser('user');
         const username = interaction.options.getString('username').toLowerCase().replace('u/','');
@@ -30,12 +31,12 @@ module.exports = {
         let serverData = await serverSchema.findOne({guildId: interaction.guild.id});
     
         if (username == userData?.redditUsername) {
-            return interaction.reply({content: "This is already this user's Reddit username!", ephemeral: true});
+            return interaction.editReply({content: "This is already this user's Reddit username!", ephemeral: true});
         }
 
         let existingUser = await userSchema.findOne({ redditUsername: username });
         if (existingUser) {
-            return interaction.reply({content: "Someone already has this username! Contact a mod if this is an issue.", ephemeral: true});
+            return interaction.editReply({content: "Someone already has this username! Contact a mod if this is an issue.", ephemeral: true});
         }
         
         try {
@@ -47,17 +48,17 @@ module.exports = {
             });
         }
         catch(err) {
-            return interaction.reply({content: "This Reddit profile doesn't exist!", ephemeral: true});
+            return interaction.editReply({content: "This Reddit profile doesn't exist!", ephemeral: true});
         }
 
         let logMessage;
         if (userData?.redditUsername) {
-            interaction.reply({content: `Changed ${user}'s Reddit username from **u/${userData.redditUsername}** to **u/${username}**`, ephemeral: true});
+            interaction.editReply({content: `Changed ${user}'s Reddit username from **u/${userData.redditUsername}** to **u/${username}**`, ephemeral: true});
             logMessage = `\`u/${userData.redditUsername}\` → \`u/${username}\``;
             userData.redditUsername = username;
         }
         else {
-            interaction.reply({content: `Got it! ${user}'s Reddit username is **u/${username}**`, ephemeral: true});
+            interaction.editReply({content: `Got it! ${user}'s Reddit username is **u/${username}**`, ephemeral: true});
             logMessage = `\`u/${username}\``;
                 
             userData = await userSchema.create({

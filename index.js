@@ -54,15 +54,14 @@ const rest = new REST({ version: '10' }).setToken(token);
 
 // Connect to MongoDB for server and user database
 mongoose.set('strictQuery', false);
-(async () => {await mongoose.connect(process.env['mongoURL'], {
-	useNewUrlParser: true,
-	useUnifiedTopology: true,
-	socketTimeoutMS: 100000,
-    keepAlive: true,
-})
-.then(() => console.log("Connected to database!"))
-.catch(err => console.error(err));
+(async () => {
+	await mongoose.connect(process.env['mongoURL'], {
+		socketTimeoutMS: 100000,
+		keepAlive: true,
+	})
+	.catch(err => console.error(err));
+	console.log("Connected to database!");
 
-client.once('ready', () => console.log(`\nPalantir is now online! ${new Date().toLocaleString()}\n`));
-client.login(token);
+	client.once('ready', () => console.log(`\nPalantir is now online! ${new Date().toLocaleString()}\n`));
+	client.login(token);
 })();
