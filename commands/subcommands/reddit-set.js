@@ -4,17 +4,18 @@ const serverSchema = require('../../models/serverSchema.js');
 const userSchema = require('../../models/userSchema.js');
 
 module.exports = async (interaction, client) => {
+    await interaction.deferReply({ ephemeral: true });
     let username = interaction.options.getString('username').toLowerCase().replace('u/','');
     let userData = await userSchema.findOne({userId: interaction.user.id});
     let serverData = await serverSchema.findOne({guildId: interaction.guild?.id});
 
     if (username == userData?.redditUsername) {
-        return interaction.reply({content: "You've already set your Reddit username!", ephemeral: true});
+        return interaction.editReply({content: "You've already set your Reddit username!", ephemeral: true});
     }
 
     let existingUser = await userSchema.findOne({ redditUsername: username });
     if (existingUser) {
-        return interaction.reply({content: "Someone already has this username! Contact a mod if this is an issue.", ephemeral: true});
+        return interaction.editReply({content: "Someone already has this username! Contact a mod if this is an issue.", ephemeral: true});
     }
     
     try {
@@ -26,17 +27,17 @@ module.exports = async (interaction, client) => {
         });
     }
     catch(err) {
-        return interaction.reply({content: "This Reddit profile doesn't exist!", ephemeral: true});
+        return interaction.editReply({content: "This Reddit profile doesn't exist!", ephemeral: true});
     }
 
     let logMessage;
     if (userData?.redditUsername) {
-        interaction.reply({content: `Changed your Reddit username from **u/${userData.redditUsername}** to **u/${username}**`, ephemeral: true});
+        interaction.editReply({content: `Changed your Reddit username from **u/${userData.redditUsername}** to **u/${username}**`, ephemeral: true});
         logMessage = `\`u/${userData.redditUsername}\` → \`u/${username}\``;
         userData.redditUsername = username;
     }
     else {
-        interaction.reply({content: `Got it! Your Reddit username is **u/${username}**`, ephemeral: true});
+        interaction.editReply({content: `Got it! Your Reddit username is **u/${username}**`, ephemeral: true});
         logMessage = `\`u/${username}\``;
         
         userData = await userSchema.create({
