@@ -5,10 +5,14 @@ const userSchema = require('../../models/userSchema.js');
 
 module.exports = async (interaction, client) => {
     await interaction.deferReply({ ephemeral: true });
+
     let username = interaction.options.getString('username').toLowerCase().replace('u/','');
     let userData = await userSchema.findOne({userId: interaction.user.id});
-    let serverData = await serverSchema.findOne({guildId: interaction.guild?.id});
 
+    let serverData = await serverSchema.findOne({guildId: interaction.guild?.id});
+    const guild = (serverData?.logChannelId) ? await client.guilds.cache.get(interaction.guild.id) : null;
+    const logChannel = (serverData?.logChannelId && guild) ? await guild.channels.fetch(serverData.logChannelId) : null;
+    
     if (username == userData?.redditUsername) {
         return interaction.editReply({content: "You've already set your Reddit username!", ephemeral: true});
     }
@@ -47,17 +51,19 @@ module.exports = async (interaction, client) => {
         console.log(`Created new user schema: ${interaction.user.tag}`);
     
         if (serverData?.redditRole) {
-            interaction.member?.roles.add(serverData.redditRole);
+            try {
+                await interaction.member?.roles?.add(serverData.redditRole);
+            }
+            catch(err) {
+                console.log(`Couldn't grant role to user ${interaction.user.tag}:\n ${err}`);
+                logChannel?.send(`*An error was encountered in granting role to user ${interaction.user}. This is most likely due to a permissions issue.*`);
+            }
         }
     }
 
     userData.save();
 
-    if (!serverData?.logChannelId) return;
-    const guild = await client.guilds.cache.get(interaction.guild.id);
-    const channel = await guild.channels.fetch(serverData.logChannelId);
-    
-    channel.send({
+    logChannel?.send({
         embeds: [
             new EmbedBuilder()
                 .setAuthor({

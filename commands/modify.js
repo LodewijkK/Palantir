@@ -53,8 +53,11 @@ module.exports = {
         const user = interaction.options.getUser('user');
         const username = interaction.options.getString('username').toLowerCase().replace('u/','');
         let userData = await userSchema.findOne({userId: user.id});
+        
         let serverData = await serverSchema.findOne({guildId: interaction.guild.id});
-    
+        const guild = (serverData?.logChannelId) ? await client.guilds.cache.get(interaction.guild.id) : null;
+        const logChannel = (serverData?.logChannelId && guild) ? await guild.channels.fetch(serverData.logChannelId) : null;
+
         if (username == userData?.redditUsername) {
             return interaction.editReply({content: "This is already this user's Reddit username!", ephemeral: true});
         }
@@ -125,18 +128,19 @@ module.exports = {
             let serverData = await serverSchema.findOne({guildId: interaction.guild.id});
             if (serverData?.redditRole) {
                 let member = interaction.guild.members.cache.get(user.id);
-                member?.roles.add(serverData.redditRole);
+                try {
+                    member?.roles.add(serverData.redditRole);
+                }
+                catch(err) {
+                    console.log(`Couldn't grant role to user ${user.tag}:\n ${err}`);
+                    logChannel?.send(`*An error was encountered in granting role to user ${user}. This is most likely due to a permissions issue.*`);
+                }
             }
         }
 
         userData.save();
-        
 
-        if (!serverData?.logChannelId) return;
-        const guild = await client.guilds.cache.get(interaction.guild.id);
-        const channel = await guild.channels.fetch(serverData.logChannelId);
-        
-        channel.send({
+        logChannel?.send({
             embeds: [
                 new EmbedBuilder()
                     .setAuthor({

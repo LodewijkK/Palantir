@@ -27,6 +27,14 @@ module.exports = {
                 .setDescription('Role for linked users')
                 .setRequired(true)
             )
+            .addBooleanOption(option => option
+                .setName('remove-old-role')
+                .setDescription('Remove the role previously set as the Reddit role from all users who have it (false by default)')
+            )
+            .addBooleanOption(option => option
+                .setName('enabled')
+                .setDescription('Enable logs in this channel (true by default)')
+            )
         ),
 
     async execute(interaction) {

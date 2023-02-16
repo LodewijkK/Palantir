@@ -56,6 +56,7 @@ const rest = new REST({ version: '10' }).setToken(token);
 mongoose.set('strictQuery', false);
 (async () => {
 	await mongoose.connect(process.env['mongoURL'], {
+		connectTimeoutMS: 100000,
 		socketTimeoutMS: 100000,
 		keepAlive: true,
 	})
