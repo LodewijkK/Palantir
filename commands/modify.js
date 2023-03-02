@@ -59,6 +59,16 @@ module.exports = {
         const logChannel = (serverData?.logChannelId && guild) ? await guild.channels.fetch(serverData.logChannelId) : null;
 
         if (username == userData?.redditUsername) {
+            if (serverData?.redditRole) {
+                let member = interaction.guild.members.cache.get(user.id);
+                try {
+                    member?.roles.add(serverData.redditRole);
+                }
+                catch(err) {
+                    console.log(`Couldn't grant role to user ${user.tag}:\n ${err}`);
+                    logChannel?.send(`*An error was encountered in granting role to user ${user}. This is most likely due to a permissions issue.*`);
+                }
+            }
             return interaction.editReply({content: "This is already this user's Reddit username!", ephemeral: true});
         }
 
@@ -66,7 +76,7 @@ module.exports = {
         if (existingUser) {
             return interaction.editReply({content: "Someone already has this username! Contact a mod if this is an issue.", ephemeral: true});
         }
-            
+
         let redditData;
         try {
             let body = await request({
@@ -124,17 +134,16 @@ module.exports = {
                 redditUsername: username
             });
             console.log(`Created new user schema: ${user.tag}`);
-        
-            let serverData = await serverSchema.findOne({guildId: interaction.guild.id});
-            if (serverData?.redditRole) {
-                let member = interaction.guild.members.cache.get(user.id);
-                try {
-                    member?.roles.add(serverData.redditRole);
-                }
-                catch(err) {
-                    console.log(`Couldn't grant role to user ${user.tag}:\n ${err}`);
-                    logChannel?.send(`*An error was encountered in granting role to user ${user}. This is most likely due to a permissions issue.*`);
-                }
+        }
+
+        if (serverData?.redditRole) {
+            let member = interaction.guild.members.cache.get(user.id);
+            try {
+                member?.roles.add(serverData.redditRole);
+            }
+            catch(err) {
+                console.log(`Couldn't grant role to user ${user.tag}:\n ${err}`);
+                logChannel?.send(`*An error was encountered in granting role to user ${user}. This is most likely due to a permissions issue.*`);
             }
         }
 

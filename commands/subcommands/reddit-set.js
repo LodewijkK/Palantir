@@ -14,6 +14,15 @@ module.exports = async (interaction, client) => {
     const logChannel = (serverData?.logChannelId && guild) ? await guild.channels.fetch(serverData.logChannelId) : null;
     
     if (username == userData?.redditUsername) {
+        if (serverData?.redditRole) {
+            try {
+                await interaction.member?.roles?.add(serverData.redditRole);
+            }
+            catch(err) {
+                console.log(`Couldn't grant role to user ${interaction.user.tag}:\n ${err}`);
+                logChannel?.send(`*An error was encountered in granting role to user ${interaction.user}. This is most likely due to a permissions issue.*`);
+            }
+        }
         return interaction.editReply({content: "You've already set your Reddit username!", ephemeral: true});
     }
 
